@@ -51,7 +51,7 @@ module Ransack
         end
         args[args.first.is_a?(Array) ? 1 : 0, 0] = capture(&block) if block_given?
         s = SortLink.new(search, attribute, args, params, &block)
-        link_to(s.name, url(routing_proxy, s.url_options), s.html_options(args))
+        link_to(s.name, url(routing_proxy, s.url_options), s.html_options)
       end
 
       # +sort_url+
@@ -130,14 +130,13 @@ module Ransack
 
         def url_options
           @params.merge(
-            @options.merge(
+            @options.except(:class).merge(
               @search.context.search_key => search_and_sort_params))
         end
 
-        def html_options(args)
-          html_options = extract_options_and_mutate_args!(args)
-          html_options.merge(
-            class: [['sort_link'.freeze, @current_dir], html_options[:class]]
+        def html_options
+          @options.merge(
+            class: [['sort_link'.freeze, @current_dir], @options[:class]]
                    .compact.join(' '.freeze)
           )
         end
